@@ -2,14 +2,19 @@
 
 ## Control Objective
 
-Ensure that a verified application satisfies the following high-level requirements:
+Ensure that untrusted files and other resources are handled safely to prevent denial of service, unauthorized access, and resource exhaustion
 
-* Untrusted file data should be handled accordingly and in a secure manner.
-* Untrusted file data obtained from untrusted sources are stored outside the web root and with limited permissions.
+## V1.12 Secure File Upload Documentation
+
+| # | Description | L1 | L2 | L3 | CWE |
+| :---: | :--- | :---: | :---: | :---: | :---: |
+| **1.12.1** | [DELETED, DUPLICATE OF 12.4.1] | | | | |
+| **1.12.2** | [DELETED, MERGED TO 50.6.1] | | | | |
+| **1.12.3** | [ADDED] Verify that, if the application allows uploading files, the documentation defines the permitted file types, expected file extensions, and maximum size (including unpacked size) for each upload feature. Additionally, ensure that the documentation specifies how files are made safe for end-users to download and process. | ✓ | ✓ | ✓ | |
 
 ## V12.1 File Upload
 
-Although zip bombs can be effectively tested using penetration testing techniques, they are classified as L2 and above to encourage consideration during design and development, as well as careful manual testing. This classification also aims to prevent automated or unskilled manual penetration testing from triggering a denial of service condition.
+Upload functionality is a key source of untrusted files. These should be carefully validated to prevent risks such as denial of service, unauthorized access, and resource exhaustion.
 
 | # | Description | L1 | L2 | L3 | CWE |
 | :---: | :--- | :---: | :---: | :---: | :---: |
@@ -20,12 +25,16 @@ Although zip bombs can be effectively tested using penetration testing technique
 
 ## V12.2 File Integrity and Content
 
+Uploaded files and uploaded files within archives must match expected file types and content formats, and oversized images must be blocked to prevent pixel flood attacks.
+
 | # | Description | L1 | L2 | L3 | CWE |
 | :---: | :--- | :---: | :---: | :---: | :---: |
-| **12.2.1** | [MODIFIED] Verify that when the application accepts a file, it checks if the file extension matches an expected file extension and validates that the contents correspond to the type represented by the extension. This includes, but is not limited to, checking the initial 'magic bytes', performing image re-writing, and using specialized libraries for file content validation. | | ✓ | ✓ | 434 |
+| **12.2.1** | [MODIFIED] Verify that when the application accepts a file, either on its own or within an archive such as a zip file, it checks if the file extension matches an expected file extension and validates that the contents correspond to the type represented by the extension. This includes, but is not limited to, checking the initial 'magic bytes', performing image re-writing, and using specialized libraries for file content validation. | | ✓ | ✓ | 434 |
 | **12.2.2** | [ADDED] Verify that the application blocks uploaded images with a pixel size larger than the maximum allowed, to prevent pixel flood attacks. | ✓ | ✓ | ✓ | 400 |
 
 ## V12.3 File Execution
+
+File operations should not rely on user-submitted filenames or metadata to avoid path traversal and inclusion attacks, and server-side file processing should ignore user-provided path details to prevent vulnerabilities like zip slip.
 
 | # | Description | L1 | L2 | L3 | CWE |
 | :---: | :--- | :---: | :---: | :---: | :---: |
@@ -34,10 +43,12 @@ Although zip bombs can be effectively tested using penetration testing technique
 | **12.3.3** | [DELETED, MERGED TO 12.3.1] | | | | |
 | **12.3.4** | [MOVED TO 12.5.3] | | | | |
 | **12.3.5** | [DELETED, DUPLICATE OF 5.3.8] | | | | |
-| **12.3.6** | Verify that the application does not include and execute functionality from untrusted sources, such as unverified content distribution networks, JavaScript libraries, node npm libraries, or server-side DLLs. | | ✓ | ✓ | 829 |
+| **12.3.6** | [DELETED, DUPLICATE OF 14.2.4] | | | | |
 | **12.3.7** | [ADDED] Verify that server-side file processing such as file decompression ignores user-provided path information to prevent vulnerabilities such as zip slip. | ✓ | ✓ | ✓ | 23 |
 
 ## V12.4 File Storage
+
+Files from untrusted sources, when stored in public folders, must not be executable as server-side code. Files from untrusted sources must also be scanned by antivirus software to prevent serving malicious content.
 
 | # | Description | L1 | L2 | L3 | CWE |
 | :---: | :--- | :---: | :---: | :---: | :---: |
@@ -46,12 +57,14 @@ Although zip bombs can be effectively tested using penetration testing technique
 
 ## V12.5 File Download
 
+User-submitted filenames should be validated or ignored in the Content-Disposition header for downloads, and that served filenames are encoded or sanitized to prevent injection attacks.
+
 | # | Description | L1 | L2 | L3 | CWE |
 | :---: | :--- | :---: | :---: | :---: | :---: |
 | **12.5.1** | [MOVED TO 14.3.6] | | | | |
-| **12.5.2** | [MOVED TO 50.5.1] | | | | |
-| **12.5.3** | [MODIFIED, MOVED FROM 12.3.4] Verify that the application validates or ignores user-submitted filenames, including in a JSON, JSONP, or URL parameter and specifies a filename in the Content-Disposition header in the response. | ✓ | ✓ | ✓ | 641 |
-| **12.5.4** | [ADDED] Verify that file names served (e.g., in HTTP response headers or email attachments) are encoded or sanitized (e.g., following RFC 6266) to preserve document structure and prevent injection attacks. | ✓ | ✓ | ✓ | |
+| **12.5.2** | [MOVED TO 50.6.1] | | | | |
+| **12.5.3** | [MODIFIED, MOVED FROM 12.3.4] Verify that the application validates or ignores user-submitted filenames, including in a JSON, JSONP, or URL parameter and specifies a filename in the Content-Disposition header field in the response. | ✓ | ✓ | ✓ | 641 |
+| **12.5.4** | [ADDED] Verify that file names served (e.g., in HTTP response header fields or email attachments) are encoded or sanitized (e.g., following RFC 6266) to preserve document structure and prevent injection attacks. | ✓ | ✓ | ✓ | |
 
 ## V12.6 SSRF Protection
 
@@ -60,6 +73,8 @@ Although zip bombs can be effectively tested using penetration testing technique
 | **12.6.1** | [MOVED TO 14.6.1] | | | | |
 
 ## V12.7 Application Resources
+
+Applications must release system resources like database connections, open files, and threads after use to prevent resource exhaustion.
 
 | # | Description | L1 | L2 | L3 | CWE |
 | :---: | :--- | :---: | :---: | :---: | :---: |
